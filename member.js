@@ -167,8 +167,19 @@ function navigateTo(page) {
 
 /* ---- Sidebar toggle ---- */
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('open');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const mainContent = document.getElementById('mainContent');
+
+  if (window.innerWidth >= 1024) {
+    // Desktop: collapse/expand sidebar
+    sidebar.classList.toggle('desktop-collapsed');
+    if (mainContent) mainContent.classList.toggle('expanded');
+  } else {
+    // Mobile: toggle overlay
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  }
 }
 
 /* ---- Notifications ---- */

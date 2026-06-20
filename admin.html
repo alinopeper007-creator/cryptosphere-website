@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CryptoSphere Admin-Panel — Verwaltung von Topups, Nutzern und Plattform-Statistiken." />
+  <title>CryptoSphere — Admin-Panel</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'cs-black': '#0B0F1A',
+            'cs-gold': '#D4AF37',
+            'cs-blue': '#00AEEF',
+            'cs-dark': '#0F1424',
+            'cs-card': '#11172B',
+            'cs-border': '#1E2740',
+          },
+          fontFamily: {
+            'sans': ['Inter', 'sans-serif'],
+            'display': ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-cs-black text-white font-sans antialiased">
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div class="absolute inset-0 bg-grid opacity-20"></div>
+    <div class="absolute inset-0 bg-radial-glow"></div>
+
+    <div class="relative w-full max-w-md">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center mb-4">
+          <div class="relative w-48">
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-cs-gold via-cs-blue to-cs-gold opacity-20 blur-xl"></div>
+            <div class="relative w-full rounded-2xl border border-cs-gold/40 overflow-hidden bg-cs-dark/50 p-2">
+              <img src="https://huggingface.co/spaces/alinopeper007/deepsite-project-lu7bc/resolve/main/images/CryptoSphere.png" alt="CryptoSphere Logo" class="w-full h-auto object-contain rounded-xl" />
+            </div>
+          </div>
+        </div>
+        <h1 class="font-display text-2xl font-bold">Crypto<span class="text-cs-gold">Sphere</span></h1>
+        <p class="text-sm text-gray-400 mt-2">Admin-Panel Zugang</p>
+      </div>
+
+      <div class="bg-cs-card border border-cs-border rounded-2xl p-8 space-y-5">
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Admin-ID</label>
+          <input type="text" id="loginUser" class="cs-input" placeholder="ADMIN-001" value="ADMIN-001" />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Passwort</label>
+          <input type="password" id="loginPass" class="cs-input" placeholder="••••••••" value="admin1234" />
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <label class="flex items-center gap-2 text-gray-400 cursor-pointer">
+            <input type="checkbox" checked class="accent-cs-gold" />
+            Angemeldet bleiben
+          </label>
+          <a href="#" class="text-cs-blue hover:underline">Passwort vergessen?</a>
+        </div>
+        <button onclick="handleAdminLogin()" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-cs-gold to-yellow-600 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-cs-gold/30 transition-all">
+          <i data-lucide="log-in" class="w-5 h-5"></i>
+          Anmelden
+        </button>
+        <div id="loginError" class="hidden items-center gap-2 text-red-400 text-sm">
+          <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+          <span>Ungültige Zugangsdaten. Bitte versuche es erneut.</span>
+        </div>
+        <div class="text-center">
+          <a href="index.html" class="text-xs text-gray-500 hover:text-cs-blue">← Zurück zur Startseite</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Layout -->
+  <div id="dashboardLayout" class="hidden min-h-screen">
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-screen w-64 bg-cs-dark border-r border-cs-border z-50 flex flex-col">
+      <!-- Logo -->
+      <div class="p-6 border-b border-cs-border flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2">
+          <img src="https://huggingface.co/spaces/alinopeper007/deepsite-project-lu7bc/resolve/main/images/CryptoSphere.png" alt="CryptoSphere Logo" class="h-16 w-auto object-contain" />
+        </a>
+        <button onclick="toggleSidebar()" class="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <button onclick="toggleSidebar()" class="hidden lg:block p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
+          <i data-lucide="chevrons-left" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+        <div class="sidebar-link active" data-page="dashboard" onclick="navigateTo('dashboard')">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          Dashboard
+        </div>
+        <div class="sidebar-link" data-page="topup" onclick="navigateTo('topup')">
+          <i data-lucide="credit-card" class="w-5 h-5"></i>
+          Topup-Verwaltung
+        </div>
+        <div class="sidebar-link" data-page="users" onclick="navigateTo('users')">
+          <i data-lucide="users" class="w-5 h-5"></i>
+          Nutzer
+        </div>
+        <div class="sidebar-link" data-page="analytics" onclick="navigateTo('analytics')">
+          <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+          Statistiken
+        </div>
+        <div class="sidebar-link" data-page="settings" onclick="navigateTo('settings')">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+          Einstellungen
+        </div>
+      </nav>
+
+      <!-- Footer -->
+      <div class="p-4 border-t border-cs-border">
+        <a href="index.html" onclick="handleLogout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+          <span class="text-sm font-medium">Abmelden</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content">
+      <!-- Top Bar -->
+      <header class="sticky top-0 z-40 bg-cs-black/80 backdrop-blur-xl border-b border-cs-border">
+        <div class="flex items-center justify-between px-4 sm:px-6 py-4">
+          <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="p-2 text-gray-400 hover:text-white">
+              <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            <div>
+              <h2 id="pageTitle" class="font-display text-lg font-bold">Dashboard</h2>
+              <p id="pageSubtitle" class="text-xs text-gray-500">Admin-Übersicht</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- Notifications -->
+            <div class="relative">
+              <button onclick="toggleNotifPanel()" class="relative p-2 rounded-lg bg-cs-card border border-cs-border hover:border-cs-blue/50 transition-all">
+                <i data-lucide="bell" class="w-5 h-5 text-gray-400"></i>
+                <span class="notification-dot"></span>
+              </button>
+              <div id="notifPanel" class="hidden absolute right-0 mt-2 w-80 bg-cs-card border border-cs-border rounded-xl shadow-2xl z-50">
+                <div class="p-4 border-b border-cs-border">
+                  <h3 class="font-semibold text-sm">Benachrichtigungen</h3>
+                </div>
+                <div class="max-h-80 overflow-y-auto" id="notifList">
+                  <!-- populated by JS -->
+                </div>
+                <div class="p-3 border-t border-cs-border text-center">
+                  <a href="#" class="text-xs text-cs-blue hover:underline">Alle anzeigen</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admin Avatar -->
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cs-gold to-cs-blue p-0.5">
+                <div id="topBarAvatar" class="w-full h-full rounded-full bg-cs-dark flex items-center justify-center text-xs font-bold text-cs-gold">AD</div>
+              </div>
+              <div class="hidden sm:block">
+                <div id="topBarName" class="text-sm font-semibold">Admin</div>
+                <div id="topBarUserId" class="text-xs text-gray-500">ADMIN-001</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <main class="p-4 sm:p-6 lg:p-8">
+
+        <!-- ===== DASHBOARD PAGE ===== -->
+        <div id="page-dashboard" class="page-content active space-y-6">
+          <!-- Stats Row -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-blue/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center">
+                  <i data-lucide="users" class="w-5 h-5 text-cs-blue"></i>
+                </div>
+                <span class="text-xs text-green-400 font-medium">+8,2%</span>
+              </div>
+              <div class="text-2xl font-bold font-display">3.847</div>
+              <div class="text-xs text-gray-500 mt-1">Aktive Nutzer</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-gold/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center">
+                  <i data-lucide="credit-card" class="w-5 h-5 text-cs-gold"></i>
+                </div>
+                <span class="text-xs text-green-400 font-medium">+15,3%</span>
+              </div>
+              <div class="text-2xl font-bold font-display">$184.250</div>
+              <div class="text-xs text-gray-500 mt-1">Topup-Volumen</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-blue/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center">
+                  <i data-lucide="activity" class="w-5 h-5 text-cs-blue"></i>
+                </div>
+                <span class="text-xs text-gray-500">24 Std.</span>
+              </div>
+              <div class="text-2xl font-bold font-display">42</div>
+              <div class="text-xs text-gray-500 mt-1">Topups heute</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-gold/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center">
+                  <i data-lucide="trending-up" class="w-5 h-5 text-cs-gold"></i>
+                </div>
+                <span class="text-xs text-green-400 font-medium">+12,5%</span>
+              </div>
+              <div class="text-2xl font-bold font-display">$2,8M</div>
+              <div class="text-xs text-gray-500 mt-1">Gesamtvolumen</div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid lg:grid-cols-2 gap-6">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-semibold text-lg">Topup-Volumen</h3>
+                  <p class="text-xs text-gray-500">Monatliche Übersicht</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="px-3 py-1 text-xs rounded-lg bg-cs-blue/10 text-cs-blue border border-cs-blue/30">1M</button>
+                  <button class="px-3 py-1 text-xs rounded-lg text-gray-400 border border-cs-border">3M</button>
+                  <button class="px-3 py-1 text-xs rounded-lg text-gray-400 border border-cs-border">1Y</button>
+                </div>
+              </div>
+              <div class="chart-container" style="height: 200px; position: relative;">
+                <canvas id="topupChart"></canvas>
+              </div>
+            </div>
+
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-semibold text-lg">Nutzerwachstum</h3>
+                  <p class="text-xs text-gray-500">Neue Registrierungen</p>
+                </div>
+              </div>
+              <div class="chart-container" style="height: 200px; position: relative;">
+                <canvas id="userGrowthChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Topups -->
+          <div class="bg-cs-card border border-cs-border rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-cs-border flex items-center justify-between">
+              <h3 class="font-semibold text-lg">Letzte Topups</h3>
+              <button onclick="navigateTo('topup')" class="text-xs text-cs-blue hover:underline flex items-center gap-1">
+                Alle anzeigen
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="cs-table">
+                <thead>
+                  <tr>
+                    <th>Nutzer</th>
+                    <th>ID</th>
+                    <th>Betrag</th>
+                    <th>Methode</th>
+                    <th>Status</th>
+                    <th>Datum</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTopupsBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TOPUP MANAGEMENT PAGE ===== -->
+        <div id="page-topup" class="page-content space-y-6">
+          <!-- Topup Stats -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Heute</div>
+              <div class="text-2xl font-bold font-display text-cs-gold">$12.450</div>
+              <div class="text-xs text-gray-500 mt-1">42 Topups</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Diese Woche</div>
+              <div class="text-2xl font-bold font-display text-cs-blue">$78.320</div>
+              <div class="text-xs text-gray-500 mt-1">284 Topups</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Diesen Monat</div>
+              <div class="text-2xl font-bold font-display text-white">$184.250</div>
+              <div class="text-xs text-gray-500 mt-1">1.247 Topups</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Ausstehend</div>
+              <div class="text-2xl font-bold font-display text-yellow-400">8</div>
+              <div class="text-xs text-gray-500 mt-1">Genehmigung erforderlich</div>
+            </div>
+          </div>
+
+          <!-- Topup Actions -->
+          <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Manual Topup -->
+            <div class="lg:col-span-2 bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-5">Topup manuell hinzufügen</h3>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Nutzer-ID</label>
+                  <input type="text" id="topupUserId" class="cs-input" placeholder="CS-001234" />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Betrag ($)</label>
+                  <input type="number" id="topupAmount" class="cs-input" placeholder="100.00" min="1" step="0.01" />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Zahlungsmethode</label>
+                  <select id="topupMethod" class="cs-input">
+                    <option value="credit-card">Kreditkarte</option>
+                    <option value="bank-transfer">Banküberweisung</option>
+                    <option value="crypto">Krypto-Wallet</option>
+                    <option value="internal">Internes Guthaben</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Status</label>
+                  <select id="topupStatus" class="cs-input">
+                    <option value="completed">Abgeschlossen</option>
+                    <option value="pending">Ausstehend</option>
+                    <option value="failed">Fehlgeschlagen</option>
+                  </select>
+                </div>
+              </div>
+              <button onclick="addManualTopup()" class="mt-5 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cs-gold to-yellow-600 text-black font-semibold rounded-xl hover:shadow-lg hover:shadow-cs-gold/30 transition-all">
+                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                Topup hinzufügen
+              </button>
+              <div id="topupSuccess" class="hidden mt-3 flex items-center gap-2 text-green-400 text-sm">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>Topup erfolgreich hinzugefügt!</span>
+              </div>
+              <div id="topupError" class="hidden mt-3 flex items-center gap-2 text-red-400 text-sm">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                <span id="topupErrorText">Bitte fülle alle Felder aus.</span>
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-5">Topup-Methoden</h3>
+              <div class="space-y-4">
+                <div>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="credit-card" class="w-4 h-4 text-cs-blue"></i>
+                      <span class="text-sm">Kreditkarte</span>
+                    </div>
+                    <span class="text-sm font-semibold">58%</span>
+                  </div>
+                  <div class="w-full bg-cs-dark rounded-full h-2">
+                    <div class="bg-cs-blue h-2 rounded-full" style="width: 58%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="building-2" class="w-4 h-4 text-cs-gold"></i>
+                      <span class="text-sm">Banküberweisung</span>
+                    </div>
+                    <span class="text-sm font-semibold">24%</span>
+                  </div>
+                  <div class="w-full bg-cs-dark rounded-full h-2">
+                    <div class="bg-cs-gold h-2 rounded-full" style="width: 24%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="wallet" class="w-4 h-4 text-green-400"></i>
+                      <span class="text-sm">Krypto-Wallet</span>
+                    </div>
+                    <span class="text-sm font-semibold">12%</span>
+                  </div>
+                  <div class="w-full bg-cs-dark rounded-full h-2">
+                    <div class="bg-green-400 h-2 rounded-full" style="width: 12%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-400"></i>
+                      <span class="text-sm">Intern</span>
+                    </div>
+                    <span class="text-sm font-semibold">6%</span>
+                  </div>
+                  <div class="w-full bg-cs-dark rounded-full h-2">
+                    <div class="bg-gray-400 h-2 rounded-full" style="width: 6%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- All Topups Table -->
+          <div class="bg-cs-card border border-cs-border rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-cs-border flex items-center justify-between flex-wrap gap-4">
+              <h3 class="font-semibold text-lg">Alle Topups</h3>
+              <div class="flex gap-2">
+                <input type="text" id="topupSearch" onkeyup="filterTopups()" class="cs-input max-w-xs" placeholder="Suche nach Nutzer-ID..." />
+                <select id="topupFilterStatus" onchange="filterTopups()" class="cs-input max-w-xs">
+                  <option value="">Alle Status</option>
+                  <option value="completed">Abgeschlossen</option>
+                  <option value="pending">Ausstehend</option>
+                  <option value="failed">Fehlgeschlagen</option>
+                </select>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="cs-table">
+                <thead>
+                  <tr>
+                    <th>Transaktions-ID</th>
+                    <th>Nutzer</th>
+                    <th>ID</th>
+                    <th>Betrag</th>
+                    <th>Methode</th>
+                    <th>Status</th>
+                    <th>Datum</th>
+                    <th>Aktion</th>
+                  </tr>
+                </thead>
+                <tbody id="topupTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== USERS PAGE ===== -->
+        <div id="page-users" class="page-content space-y-6">
+          <div class="bg-cs-card border border-cs-border rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-cs-border flex items-center justify-between flex-wrap gap-4">
+              <h3 class="font-semibold text-lg">Nutzerverwaltung</h3>
+              <input type="text" id="userSearch" onkeyup="filterUsers()" class="cs-input max-w-xs" placeholder="Suche nach Name oder ID..." />
+            </div>
+            <div class="overflow-x-auto">
+              <table class="cs-table">
+                <thead>
+                  <tr>
+                    <th>Nutzer</th>
+                    <th>Benutzer-ID</th>
+                    <th>E-Mail</th>
+                    <th>Stufe</th>
+                    <th>Guthaben</th>
+                    <th>Status</th>
+                    <th>Registriert</th>
+                  </tr>
+                </thead>
+                <tbody id="userTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ANALYTICS PAGE ===== -->
+        <div id="page-analytics" class="page-content space-y-6">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Conversion Rate</div>
+              <div class="text-2xl font-bold font-display text-cs-gold">24,8%</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Ø Topup-Wert</div>
+              <div class="text-2xl font-bold font-display text-cs-blue">$147,70</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Wiederkehrende Nutzer</div>
+              <div class="text-2xl font-bold font-display text-white">68%</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Churn Rate</div>
+              <div class="text-2xl font-bold font-display text-red-400">3,2%</div>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-6">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-4">Umsatz nach Region</h3>
+              <div class="chart-container" style="height: 250px; position: relative;">
+                <canvas id="regionChart"></canvas>
+              </div>
+            </div>
+
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-4">Topup-Verteilung</h3>
+              <div class="chart-container" style="height: 250px; position: relative;">
+                <canvas id="distributionChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SETTINGS PAGE ===== -->
+        <div id="page-settings" class="page-content space-y-6">
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Plattform-Einstellungen</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Min. Topup-Betrag ($)</label>
+                <input type="number" class="cs-input" value="10" min="1" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Max. Topup-Betrag ($)</label>
+                <input type="number" class="cs-input" value="50000" min="1" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Transaktionsgebühr (%)</label>
+                <input type="number" class="cs-input" value="2.5" min="0" step="0.1" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Mindestauszahlung ($)</label>
+                <input type="number" class="cs-input" value="100" min="1" />
+              </div>
+            </div>
+            <button class="mt-5 px-6 py-2.5 text-sm font-semibold rounded-lg bg-cs-blue/10 text-cs-blue border border-cs-blue/30 hover:bg-cs-blue/20 transition-all">Einstellungen speichern</button>
+          </div>
+
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Sicherheit</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border">
+                <div>
+                  <div class="text-sm font-semibold">Admin-Passwort ändern</div>
+                  <div class="text-xs text-gray-500">Zuletzt vor 45 Tagen geändert</div>
+                </div>
+                <button class="px-4 py-2 text-xs rounded-lg text-cs-blue border border-cs-blue/30 hover:bg-cs-blue/10 transition-all">Ändern</button>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border">
+                <div>
+                  <div class="text-sm font-semibold">Zwei-Faktor-Authentifizierung</div>
+                  <div class="text-xs text-gray-500">Per Auth-App aktiviert</div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full status-active text-xs font-medium">Aktiviert</span>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border">
+                <div>
+                  <div class="text-sm font-semibold">IP-Whitelist</div>
+                  <div class="text-xs text-gray-500">3 zugelassene IPs</div>
+                </div>
+                <button class="px-4 py-2 text-xs rounded-lg text-cs-blue border border-cs-blue/30 hover:bg-cs-blue/10 transition-all">Verwalten</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6 border-red-500/20">
+            <h3 class="font-semibold text-lg mb-5 text-red-400">Gefahrenzone</h3>
+            <div class="flex items-center justify-between p-4 bg-red-500/5 rounded-xl border border-red-500/20">
+              <div>
+                <div class="text-sm font-semibold">Wartungsmodus aktivieren</div>
+                <div class="text-xs text-gray-500">Sperrt die Plattform für alle Nutzer</div>
+              </div>
+              <button class="px-4 py-2 text-xs rounded-lg text-red-400 border border-red-400/30 hover:bg-red-500/10 transition-all">Aktivieren</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -98,10 +98,16 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar fixed top-0 left-0 h-screen w-64 bg-cs-dark border-r border-cs-border z-50 flex flex-col">
       <!-- Logo -->
-      <div class="p-6 border-b border-cs-border">
+      <div class="p-6 border-b border-cs-border flex items-center justify-between">
         <a href="index.html" class="flex items-center gap-2">
           <img src="https://huggingface.co/spaces/alinopeper007/deepsite-project-lu7bc/resolve/main/images/CryptoSphere.png" alt="CryptoSphere Logo" class="h-16 w-auto object-contain" />
         </a>
+        <button onclick="toggleSidebar()" class="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <button onclick="toggleSidebar()" class="hidden lg:block p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
+          <i data-lucide="chevrons-left" class="w-5 h-5"></i>
+        </button>
       </div>
 
       <!-- Navigation -->
@@ -138,7 +144,7 @@
 
       <!-- Footer -->
       <div class="p-4 border-t border-cs-border">
-        <a href="index.html" onclick="handleLogout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
+        <a href="javascript:void(0)" onclick="handleLogout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
           <i data-lucide="log-out" class="w-5 h-5"></i>
           <span class="text-sm font-medium">Abmelden</span>
         </a>
@@ -146,12 +152,12 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="lg:ml-64">
+    <div id="mainContent" class="main-content">
       <!-- Top Bar -->
       <header class="sticky top-0 z-40 bg-cs-black/80 backdrop-blur-xl border-b border-cs-border">
         <div class="flex items-center justify-between px-4 sm:px-6 py-4">
           <div class="flex items-center gap-4">
-            <button onclick="toggleSidebar()" class="lg:hidden p-2 text-gray-400 hover:text-white">
+            <button onclick="toggleSidebar()" class="p-2 text-gray-400 hover:text-white">
               <i data-lucide="menu" class="w-6 h-6"></i>
             </button>
             <div>
