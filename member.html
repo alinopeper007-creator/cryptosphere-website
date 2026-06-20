@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CryptoSphere Mitglieder-Dashboard — Zugriff auf dein Netzwerk, Belohnungen und digitale Assets." />
+  <title>CryptoSphere — Mitglieder-Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'cs-black': '#0B0F1A',
+            'cs-gold': '#D4AF37',
+            'cs-blue': '#00AEEF',
+            'cs-dark': '#0F1424',
+            'cs-card': '#11172B',
+            'cs-border': '#1E2740',
+          },
+          fontFamily: {
+            'sans': ['Inter', 'sans-serif'],
+            'display': ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-cs-black text-white font-sans antialiased">
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div class="absolute inset-0 bg-grid opacity-20"></div>
+    <div class="absolute inset-0 bg-radial-glow"></div>
+
+    <div class="relative w-full max-w-md">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center mb-4">
+          <div class="relative w-48">
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-cs-gold via-cs-blue to-cs-gold opacity-20 blur-xl"></div>
+            <div class="relative w-full rounded-2xl border border-cs-gold/40 overflow-hidden bg-cs-dark/50 p-2">
+              <img src="https://huggingface.co/spaces/alinopeper007/deepsite-project-lu7bc/resolve/main/images/CryptoSphere.png" alt="CryptoSphere Logo" class="w-full h-auto object-contain rounded-xl" />
+            </div>
+          </div>
+        </div>
+        <h1 class="font-display text-2xl font-bold">Crypto<span class="text-cs-gold">Sphere</span></h1>
+        <p class="text-sm text-gray-400 mt-2">Zugang zum Mitglieder-Portal</p>
+      </div>
+
+      <div class="bg-cs-card border border-cs-border rounded-2xl p-8 space-y-5">
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Benutzer-ID</label>
+          <input type="text" id="loginUser" class="cs-input" placeholder="CS-001234" value="CS-001234" />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Passwort</label>
+          <input type="password" id="loginPass" class="cs-input" placeholder="••••••••" value="demo1234" />
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <label class="flex items-center gap-2 text-gray-400 cursor-pointer">
+            <input type="checkbox" checked class="accent-cs-gold" />
+            Angemeldet bleiben
+          </label>
+          <a href="#" class="text-cs-blue hover:underline">Passwort vergessen?</a>
+        </div>
+        <button onclick="handleLogin()" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-cs-gold to-yellow-600 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-cs-gold/30 transition-all">
+          <i data-lucide="log-in" class="w-5 h-5"></i>
+          Anmelden
+        </button>
+        <div id="loginError" class="hidden items-center gap-2 text-red-400 text-sm">
+          <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+          <span>Ungültige Zugangsdaten. Bitte versuche es erneut.</span>
+        </div>
+        <div class="text-center">
+          <a href="index.html" class="text-xs text-gray-500 hover:text-cs-blue">← Zurück zur Startseite</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Layout -->
+  <div id="dashboardLayout" class="hidden min-h-screen">
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-screen w-64 bg-cs-dark border-r border-cs-border z-50 flex flex-col">
+      <!-- Logo -->
+      <div class="p-6 border-b border-cs-border">
+        <a href="index.html" class="flex items-center gap-2">
+          <img src="https://huggingface.co/spaces/alinopeper007/deepsite-project-lu7bc/resolve/main/images/CryptoSphere.png" alt="CryptoSphere Logo" class="h-16 w-auto object-contain" />
+        </a>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+        <div class="sidebar-link active" data-page="dashboard" onclick="navigateTo('dashboard')">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          Dashboard
+        </div>
+        <div class="sidebar-link" data-page="profile" onclick="navigateTo('profile')">
+          <i data-lucide="user" class="w-5 h-5"></i>
+          Mein Profil
+        </div>
+        <div class="sidebar-link" data-page="network" onclick="navigateTo('network')">
+          <i data-lucide="network" class="w-5 h-5"></i>
+          Mein Netzwerk
+        </div>
+        <div class="sidebar-link" data-page="activity" onclick="navigateTo('activity')">
+          <i data-lucide="activity" class="w-5 h-5"></i>
+          Aktivität
+        </div>
+        <div class="sidebar-link" data-page="rewards" onclick="navigateTo('rewards')">
+          <i data-lucide="gift" class="w-5 h-5"></i>
+          Belohnungen
+        </div>
+        <div class="sidebar-link" data-page="contracts" onclick="navigateTo('contracts')">
+          <i data-lucide="file-text" class="w-5 h-5"></i>
+          Verträge
+        </div>
+        <div class="sidebar-link" data-page="settings" onclick="navigateTo('settings')">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+          Einstellungen
+        </div>
+      </nav>
+
+      <!-- Footer -->
+      <div class="p-4 border-t border-cs-border">
+        <a href="index.html" onclick="handleLogout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+          <span class="text-sm font-medium">Abmelden</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="lg:ml-64">
+      <!-- Top Bar -->
+      <header class="sticky top-0 z-40 bg-cs-black/80 backdrop-blur-xl border-b border-cs-border">
+        <div class="flex items-center justify-between px-4 sm:px-6 py-4">
+          <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 text-gray-400 hover:text-white">
+              <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            <div>
+              <h2 id="pageTitle" class="font-display text-lg font-bold">Dashboard</h2>
+              <p id="pageSubtitle" class="text-xs text-gray-500">Willkommen zurück in deinem Ökosystem</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- Notifications -->
+            <div class="relative">
+              <button onclick="toggleNotifPanel()" class="relative p-2 rounded-lg bg-cs-card border border-cs-border hover:border-cs-blue/50 transition-all">
+                <i data-lucide="bell" class="w-5 h-5 text-gray-400"></i>
+                <span class="notification-dot"></span>
+              </button>
+              <div id="notifPanel" class="hidden absolute right-0 mt-2 w-80 bg-cs-card border border-cs-border rounded-xl shadow-2xl z-50">
+                <div class="p-4 border-b border-cs-border">
+                  <h3 class="font-semibold text-sm">Benachrichtigungen</h3>
+                </div>
+                <div class="max-h-80 overflow-y-auto" id="notifList">
+                  <!-- populated by JS -->
+                </div>
+                <div class="p-3 border-t border-cs-border text-center">
+                  <a href="#" class="text-xs text-cs-blue hover:underline">Alle anzeigen</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Avatar -->
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cs-gold to-cs-blue p-0.5">
+                <div id="topBarAvatar" class="w-full h-full rounded-full bg-cs-dark flex items-center justify-center text-xs font-bold text-cs-gold">JD</div>
+              </div>
+              <div class="hidden sm:block">
+                <div id="topBarName" class="text-sm font-semibold">John Doe</div>
+                <div id="topBarUserId" class="text-xs text-gray-500">CS-001234</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <main class="p-4 sm:p-6 lg:p-8">
+
+        <!-- ===== DASHBOARD PAGE ===== -->
+        <div id="page-dashboard" class="page-content active space-y-6">
+          <!-- Stats Row -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-blue/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center">
+                  <i data-lucide="trending-up" class="w-5 h-5 text-cs-blue"></i>
+                </div>
+                <span class="text-xs text-green-400 font-medium">+12,5%</span>
+              </div>
+              <div class="text-2xl font-bold font-display">$24,580</div>
+              <div class="text-xs text-gray-500 mt-1">Gesamteinnahmen</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-gold/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center">
+                  <i data-lucide="users" class="w-5 h-5 text-cs-gold"></i>
+                </div>
+                <span class="text-xs text-green-400 font-medium">+8 neu</span>
+              </div>
+              <div class="text-2xl font-bold font-display">142</div>
+              <div class="text-xs text-gray-500 mt-1">Netzwerk-Mitglieder</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-blue/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center">
+                  <i data-lucide="gift" class="w-5 h-5 text-cs-blue"></i>
+                </div>
+                <span class="text-xs text-green-400 font-medium">+2,450</span>
+              </div>
+              <div class="text-2xl font-bold font-display">12,800</div>
+              <div class="text-xs text-gray-500 mt-1">Belohnungspunkte</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5 hover:border-cs-gold/30 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-lg bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center">
+                  <i data-lucide="activity" class="w-5 h-5 text-cs-gold"></i>
+                </div>
+                <span class="text-xs text-gray-500">7 Tage</span>
+              </div>
+              <div class="text-2xl font-bold font-display">96.4%</div>
+              <div class="text-xs text-gray-500 mt-1">Aktivitätsrate</div>
+            </div>
+          </div>
+
+          <!-- User Card + Connected Accounts -->
+          <div class="grid lg:grid-cols-3 gap-6">
+            <!-- User Card -->
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <div class="flex items-center gap-4 mb-6">
+                <div class="relative">
+                  <div class="w-16 h-16 rounded-full bg-gradient-to-br from-cs-gold to-cs-blue p-0.5">
+                    <div id="dashAvatar" class="w-full h-full rounded-full bg-cs-dark flex items-center justify-center text-xl font-bold text-cs-gold">JD</div>
+                  </div>
+                  <div class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-green-500 border-2 border-cs-card"></div>
+                </div>
+                <div>
+                  <h3 id="dashName" class="font-semibold text-lg">John Doe</h3>
+                  <p class="text-xs text-gray-500">Premium-Mitglied</p>
+                </div>
+              </div>
+              <div class="space-y-3 text-sm">
+                <div class="flex items-center justify-between py-2 border-b border-cs-border">
+                  <span class="text-gray-400">Benutzer-ID</span>
+                  <span id="dashUserId" class="font-mono font-semibold">CS-001234</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-cs-border">
+                  <span class="text-gray-400">Registrierung</span>
+                  <span class="font-semibold">15. Jan. 2024</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-cs-border">
+                  <span class="text-gray-400">Stufe</span>
+                  <span class="font-semibold text-cs-gold">Gold</span>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <span class="text-gray-400">Status</span>
+                  <span class="px-2.5 py-0.5 rounded-full status-active text-xs font-medium">Aktiv</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connected Accounts -->
+            <div class="lg:col-span-2 bg-cs-card border border-cs-border rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-5">
+                <h3 class="font-semibold text-lg">Verbundene Konten</h3>
+                <button class="text-xs text-cs-blue hover:underline flex items-center gap-1">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  Konto hinzufügen
+                </button>
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border hover:border-cs-blue/30 transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center">
+                      <i data-lucide="credit-card" class="w-5 h-5 text-cs-blue"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold">Visa •••• 4892</div>
+                      <div class="text-xs text-gray-500">Hauptkonto</div>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full status-active text-xs font-medium">Connected</span>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border hover:border-cs-blue/30 transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center">
+                      <i data-lucide="wallet" class="w-5 h-5 text-cs-gold"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold">Krypto-Wallet</div>
+                      <div class="text-xs text-gray-500">0x7f3a...92d4</div>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full status-active text-xs font-medium">Connected</span>
+                </div>
+                <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border hover:border-cs-blue/30 transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gray-500/10 border border-gray-500/30 flex items-center justify-center">
+                      <i data-lucide="building-2" class="w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold">Banküberweisung</div>
+                      <div class="text-xs text-gray-500">SWIFT •••• 7781</div>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full status-pending text-xs font-medium">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid lg:grid-cols-2 gap-6">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-semibold text-lg">Leistungsanalyse</h3>
+                  <p class="text-xs text-gray-500">Monatliche Einnahmenübersicht</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="px-3 py-1 text-xs rounded-lg bg-cs-blue/10 text-cs-blue border border-cs-blue/30">1M</button>
+                  <button class="px-3 py-1 text-xs rounded-lg text-gray-400 border border-cs-border">3M</button>
+                  <button class="px-3 py-1 text-xs rounded-lg text-gray-400 border border-cs-border">1Y</button>
+                </div>
+              </div>
+              <div class="chart-container" style="height: 200px; position: relative;">
+                <canvas id="performanceChart"></canvas>
+              </div>
+            </div>
+
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-semibold text-lg">Netzwerk-Wachstum</h3>
+                  <p class="text-xs text-gray-500">Empfehlungswachstumsrate</p>
+                </div>
+              </div>
+              <div class="chart-container" style="height: 200px; position: relative;">
+                <canvas id="growthChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Overview + Notifications -->
+          <div class="grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-5">Letzte Aktivitäten</h3>
+              <div class="space-y-3">
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-cs-dark/50 transition-colors">
+                  <div class="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="arrow-down-circle" class="w-5 h-5 text-green-400"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-semibold">Belohnung erhalten</div>
+                    <div class="text-xs text-gray-500">Netzwerk-Teilnahme-Bonus</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-sm font-bold text-green-400">+$450.00</div>
+                    <div class="text-xs text-gray-500">vor 2 Std.</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-cs-dark/50 transition-colors">
+                  <div class="w-10 h-10 rounded-lg bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="user-plus" class="w-5 h-5 text-cs-blue"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-semibold">Neue Empfehlung</div>
+                    <div class="text-xs text-gray-500">Sarah Chen ist deinem Netzwerk beigetreten</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs text-gray-500">vor 5 Std.</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-cs-dark/50 transition-colors">
+                  <div class="w-10 h-10 rounded-lg bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="file-text" class="w-5 h-5 text-cs-gold"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-semibold">Vertrag unterzeichnet</div>
+                    <div class="text-xs text-gray-500">Premium-Mitgliedschaftsvereinbarung</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs text-gray-500">vor 1 Tag</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-cs-dark/50 transition-colors">
+                  <div class="w-10 h-10 rounded-lg bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-cs-blue"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-semibold">Verifizierung abgeschlossen</div>
+                    <div class="text-xs text-gray-500">Profilverifizierung genehmigt</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs text-gray-500">vor 2 Tagen</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-5">Benachrichtigungen</h3>
+              <div class="space-y-3" id="dashboardNotifs">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== PROFILE PAGE ===== -->
+        <div id="page-profile" class="page-content space-y-6">
+          <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Profile Summary -->
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6 text-center">
+              <div class="relative inline-block mb-4">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-cs-gold to-cs-blue p-0.5 mx-auto">
+                  <div id="profileAvatar" class="w-full h-full rounded-full bg-cs-dark flex items-center justify-center text-3xl font-bold text-cs-gold">JD</div>
+                </div>
+                <div class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-cs-card"></div>
+              </div>
+              <h3 id="profileName" class="font-display text-xl font-bold">John Doe</h3>
+              <p id="profileSubtitle" class="text-sm text-gray-500 mt-1">Gold-Mitglied · CS-001234</p>
+              <div class="flex justify-center gap-4 mt-4 text-xs">
+                <div class="text-center">
+                  <div class="font-bold text-lg text-cs-gold">142</div>
+                  <div class="text-gray-500">Empfehlungen</div>
+                </div>
+                <div class="w-px bg-cs-border"></div>
+                <div class="text-center">
+                  <div class="font-bold text-lg text-cs-blue">96%</div>
+                  <div class="text-gray-500">Aktivität</div>
+                </div>
+                <div class="w-px bg-cs-border"></div>
+                <div class="text-center">
+                  <div class="font-bold text-lg text-white">$24K</div>
+                  <div class="text-gray-500">Verdient</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="lg:col-span-2 bg-cs-card border border-cs-border rounded-2xl p-6">
+              <div class="flex items-center justify-between mb-5">
+                <h3 class="font-semibold text-lg">Persönliche Informationen</h3>
+                <button class="text-xs text-cs-blue hover:underline flex items-center gap-1">
+                  <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                  Bearbeiten
+                </button>
+              </div>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Vollständiger Name</label>
+                  <input id="profileNameInput" type="text" class="cs-input" value="John Doe" readonly />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">E-Mail</label>
+                  <input id="profileEmailInput" type="email" class="cs-input" value="john.doe@email.com" readonly />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Telefon</label>
+                  <input type="tel" class="cs-input" value="+49 30 1234 5678" readonly />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Land</label>
+                  <input type="text" class="cs-input" value="Deutschland" readonly />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Geburtsdatum</label>
+                  <input type="text" class="cs-input" value="12. März 1990" readonly />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Stufe</label>
+                  <input type="text" class="cs-input" value="Gold-Mitglied" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-6">
+            <!-- Documents -->
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-5">Dokumente</h3>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-cs-dark rounded-xl border border-cs-border hover:border-cs-blue/30 transition-all">
+                  <div class="flex items-center gap-3">
+                    <i data-lucide="file-text" class="w-5 h-5 text-cs-blue"></i>
+                    <div>
+                      <div class="text-sm font-semibold">ID_Verifizierung.pdf</div>
+                      <div class="text-xs text-gray-500">Verifiziert · 2,3 MB</div>
+                    </div>
+                  </div>
+                  <button class="p-2 text-gray-400 hover:text-cs-blue"><i data-lucide="download" class="w-4 h-4"></i></button>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-cs-dark rounded-xl border border-cs-border hover:border-cs-blue/30 transition-all">
+                  <div class="flex items-center gap-3">
+                    <i data-lucide="file-text" class="w-5 h-5 text-cs-gold"></i>
+                    <div>
+                      <div class="text-sm font-semibold">Wohnsitznachweis.pdf</div>
+                      <div class="text-xs text-gray-500">Verifiziert · 1,1 MB</div>
+                    </div>
+                  </div>
+                  <button class="p-2 text-gray-400 hover:text-cs-gold"><i data-lucide="download" class="w-4 h-4"></i></button>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-cs-dark rounded-xl border border-cs-border hover:border-cs-blue/30 transition-all">
+                  <div class="flex items-center gap-3">
+                    <i data-lucide="file-text" class="w-5 h-5 text-cs-blue"></i>
+                    <div>
+                      <div class="text-sm font-semibold">Vertragsvereinbarung.pdf</div>
+                      <div class="text-xs text-gray-500">Unterzeichnet · 3,5 MB</div>
+                    </div>
+                  </div>
+                  <button class="p-2 text-gray-400 hover:text-cs-blue"><i data-lucide="download" class="w-4 h-4"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- History -->
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+              <h3 class="font-semibold text-lg mb-5">Kontoverlauf</h3>
+              <div class="space-y-4">
+                <div class="flex gap-4">
+                  <div class="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
+                  <div>
+                    <div class="text-sm font-semibold">Konto auf Gold aktualisiert</div>
+                    <div class="text-xs text-gray-500">20. Januar 2024</div>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-2 h-2 rounded-full bg-cs-blue mt-2 flex-shrink-0"></div>
+                  <div>
+                    <div class="text-sm font-semibold">Profil verifiziert</div>
+                    <div class="text-xs text-gray-500">16. Januar 2024</div>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-2 h-2 rounded-full bg-cs-gold mt-2 flex-shrink-0"></div>
+                  <div>
+                    <div class="text-sm font-semibold">Erster Empfehlungs-Bonus</div>
+                    <div class="text-xs text-gray-500">18. Januar 2024</div>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-2 h-2 rounded-full bg-gray-500 mt-2 flex-shrink-0"></div>
+                  <div>
+                    <div class="text-sm font-semibold">Konto erstellt</div>
+                    <div class="text-xs text-gray-500">15. Januar 2024</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences -->
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Benutzereinstellungen</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <label class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="bell" class="w-5 h-5 text-cs-blue"></i>
+                  <div>
+                    <div class="text-sm font-semibold">E-Mail-Benachrichtigungen</div>
+                    <div class="text-xs text-gray-500">E-Mail-Updates erhalten</div>
+                  </div>
+                </div>
+                <input type="checkbox" checked class="accent-cs-gold w-5 h-5" />
+              </label>
+              <label class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="smartphone" class="w-5 h-5 text-cs-gold"></i>
+                  <div>
+                    <div class="text-sm font-semibold">SMS-Benachrichtigungen</div>
+                    <div class="text-xs text-gray-500">SMS-Updates erhalten</div>
+                  </div>
+                </div>
+                <input type="checkbox" class="accent-cs-gold w-5 h-5" />
+              </label>
+              <label class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="moon" class="w-5 h-5 text-cs-blue"></i>
+                  <div>
+                    <div class="text-sm font-semibold">Dunkelmodus</div>
+                    <div class="text-xs text-gray-500">Immer dunkles Design</div>
+                  </div>
+                </div>
+                <input type="checkbox" checked class="accent-cs-gold w-5 h-5" />
+              </label>
+              <label class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="shield" class="w-5 h-5 text-cs-gold"></i>
+                  <div>
+                    <div class="text-sm font-semibold">Zwei-Faktor-Authentifizierung</div>
+                    <div class="text-xs text-gray-500">Zusätzliche Sicherheitsebene</div>
+                  </div>
+                </div>
+                <input type="checkbox" checked class="accent-cs-gold w-5 h-5" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== NETWORK PAGE ===== -->
+        <div id="page-network" class="page-content space-y-6">
+          <!-- Network Stats -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Direkte Empfehlungen</div>
+              <div class="text-2xl font-bold font-display text-cs-gold">24</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Gesamtes Netzwerk</div>
+              <div class="text-2xl font-bold font-display text-cs-blue">142</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Aktive Mitglieder</div>
+              <div class="text-2xl font-bold font-display text-white">128</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Netzwerk-Ebene</div>
+              <div class="text-2xl font-bold font-display text-cs-gold">Stufe 5</div>
+            </div>
+          </div>
+
+          <!-- Network Visualization -->
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="font-semibold text-lg">Empfehlungsnetzwerk-Baum</h3>
+                <p class="text-xs text-gray-500">Visuelle Darstellung deines Netzwerk-Wachstums</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="px-3 py-1.5 text-xs rounded-lg bg-cs-blue/10 text-cs-blue border border-cs-blue/30 flex items-center gap-1">
+                  <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                  Erweitern
+                </button>
+                <button class="px-3 py-1.5 text-xs rounded-lg text-gray-400 border border-cs-border flex items-center gap-1">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  Exportieren
+                </button>
+              </div>
+            </div>
+            <canvas id="networkCanvas" class="w-full" style="height: 450px;"></canvas>
+          </div>
+
+          <!-- Referral list -->
+          <div class="bg-cs-card border border-cs-border rounded-2xl overflow-hidden">
+            <div class="p-6 border-b border-cs-border">
+              <h3 class="font-semibold text-lg">Direkte Empfehlungen</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="cs-table">
+                <thead>
+                  <tr>
+                    <th>Mitglied</th>
+                    <th>Benutzer-ID</th>
+                    <th>Beigetreten</th>
+                    <th>Status</th>
+                    <th>Netzwerk-Größe</th>
+                  </tr>
+                </thead>
+                <tbody id="referralTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ACTIVITY PAGE ===== -->
+        <div id="page-activity" class="page-content space-y-6">
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Aktivitätsverlauf</h3>
+            <div class="relative">
+              <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-cs-border"></div>
+              <div class="space-y-6">
+                <div class="relative pl-12">
+                  <div class="absolute left-0 w-8 h-8 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center">
+                    <i data-lucide="arrow-down-circle" class="w-4 h-4 text-green-400"></i>
+                  </div>
+                  <div class="bg-cs-dark rounded-xl border border-cs-border p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="font-semibold text-sm">Belohnung verdient</h4>
+                      <span class="text-xs text-gray-500">vor 2 Stunden</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Netzwerk-Teilnahme-Bonus von $450,00 erhalten.</p>
+                  </div>
+                </div>
+                <div class="relative pl-12">
+                  <div class="absolute left-0 w-8 h-8 rounded-full bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center">
+                    <i data-lucide="user-plus" class="w-4 h-4 text-cs-blue"></i>
+                  </div>
+                  <div class="bg-cs-dark rounded-xl border border-cs-border p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="font-semibold text-sm">Neues Netzwerk-Mitglied</h4>
+                      <span class="text-xs text-gray-500">vor 5 Stunden</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Sarah Chen ist deinem Empfehlungsnetzwerk beigetreten.</p>
+                  </div>
+                </div>
+                <div class="relative pl-12">
+                  <div class="absolute left-0 w-8 h-8 rounded-full bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center">
+                    <i data-lucide="file-signature" class="w-4 h-4 text-cs-gold"></i>
+                  </div>
+                  <div class="bg-cs-dark rounded-xl border border-cs-border p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="font-semibold text-sm">Vertrag unterzeichnet</h4>
+                      <span class="text-xs text-gray-500">vor 1 Tag</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Premium-Mitgliedschaftsvereinbarung elektronisch unterzeichnet.</p>
+                  </div>
+                </div>
+                <div class="relative pl-12">
+                  <div class="absolute left-0 w-8 h-8 rounded-full bg-cs-blue/10 border border-cs-blue/30 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-cs-blue"></i>
+                  </div>
+                  <div class="bg-cs-dark rounded-xl border border-cs-border p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="font-semibold text-sm">Verifizierung abgeschlossen</h4>
+                      <span class="text-xs text-gray-500">vor 2 Tagen</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Profilverifizierung genehmigt. Vollständiger Dashboard-Zugang gewährt.</p>
+                  </div>
+                </div>
+                <div class="relative pl-12">
+                  <div class="absolute left-0 w-8 h-8 rounded-full bg-cs-gold/10 border border-cs-gold/30 flex items-center justify-center">
+                    <i data-lucide="star" class="w-4 h-4 text-cs-gold"></i>
+                  </div>
+                  <div class="bg-cs-dark rounded-xl border border-cs-border p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="font-semibold text-sm">Stufe aktualisiert</h4>
+                      <span class="text-xs text-gray-500">vor 5 Tagen</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Konto auf Gold-Stufe mit erweiterten Belohnungen aktualisiert.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== REWARDS PAGE ===== -->
+        <div id="page-rewards" class="page-content space-y-6">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-gradient-to-br from-cs-gold/10 to-cs-card border border-cs-gold/30 rounded-2xl p-5">
+              <i data-lucide="gift" class="w-6 h-6 text-cs-gold mb-3"></i>
+              <div class="text-2xl font-bold font-display">12.800</div>
+              <div class="text-xs text-gray-400 mt-1">Gesamtpunkte</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <i data-lucide="trending-up" class="w-6 h-6 text-cs-blue mb-3"></i>
+              <div class="text-2xl font-bold font-display">2.450</div>
+              <div class="text-xs text-gray-400 mt-1">Dieser Monat</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <i data-lucide="check-circle" class="w-6 h-6 text-green-400 mb-3"></i>
+              <div class="text-2xl font-bold font-display">$1.280</div>
+              <div class="text-xs text-gray-400 mt-1">Eingelöst</div>
+            </div>
+            <div class="bg-cs-card border border-cs-border rounded-2xl p-5">
+              <i data-lucide="clock" class="w-6 h-6 text-gray-400 mb-3"></i>
+              <div class="text-2xl font-bold font-display">$1.170</div>
+              <div class="text-xs text-gray-400 mt-1">Verfügbar</div>
+            </div>
+          </div>
+
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Belohnungsverlauf</h3>
+            <div class="overflow-x-auto">
+              <table class="cs-table">
+                <thead>
+                  <tr>
+                    <th>Datum</th>
+                    <th>Beschreibung</th>
+                    <th>Typ</th>
+                    <th>Betrag</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="rewardsTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Belohnungen einlösen</h3>
+            <div class="grid sm:grid-cols-3 gap-4">
+              <div class="bg-cs-dark rounded-xl border border-cs-border p-5 hover:border-cs-gold/40 transition-all text-center">
+                <i data-lucide="wallet" class="w-8 h-8 text-cs-gold mx-auto mb-3"></i>
+                <h4 class="font-semibold mb-1">Auszahlung</h4>
+                <p class="text-xs text-gray-500 mb-4">Auf Bank überweisen</p>
+                <button class="w-full py-2 rounded-lg bg-cs-gold/10 text-cs-gold border border-cs-gold/30 text-xs font-semibold hover:bg-cs-gold/20 transition-all">Einlösen</button>
+              </div>
+              <div class="bg-cs-dark rounded-xl border border-cs-border p-5 hover:border-cs-blue/40 transition-all text-center">
+                <i data-lucide="coins" class="w-8 h-8 text-cs-blue mx-auto mb-3"></i>
+                <h4 class="font-semibold mb-1">In Token umwandeln</h4>
+                <p class="text-xs text-gray-500 mb-4">CS Token (bald verfügbar)</p>
+                <button class="w-full py-2 rounded-lg bg-cs-blue/10 text-cs-blue border border-cs-blue/30 text-xs font-semibold hover:bg-cs-blue/20 transition-all opacity-50 cursor-not-allowed">Bald</button>
+              </div>
+              <div class="bg-cs-dark rounded-xl border border-cs-border p-5 hover:border-cs-gold/40 transition-all text-center">
+                <i data-lucide="refresh-cw" class="w-8 h-8 text-cs-gold mx-auto mb-3"></i>
+                <h4 class="font-semibold mb-1">Reinvestieren</h4>
+                <p class="text-xs text-gray-500 mb-4">Netzwerk vergrößern</p>
+                <button class="w-full py-2 rounded-lg bg-cs-gold/10 text-cs-gold border border-cs-gold/30 text-xs font-semibold hover:bg-cs-gold/20 transition-all">Reinvestieren</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== CONTRACTS PAGE ===== -->
+        <div id="page-contracts" class="page-content space-y-6">
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="font-semibold text-lg">Vertragsliste</h3>
+              <button class="text-xs text-cs-blue hover:underline flex items-center gap-1">
+                <i data-lucide="file-plus" class="w-3.5 h-3.5"></i>
+                Neuen Vertrag anfordern
+              </button>
+            </div>
+            <div class="space-y-3" id="contractList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Electronic Signature Area -->
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-2">Elektronische Unterschrift</h3>
+            <p class="text-sm text-gray-400 mb-5">Zeichne unten deine Unterschrift, um ausstehende Verträge zu unterzeichnen.</p>
+            <canvas id="signaturePad" class="w-full bg-cs-dark border border-cs-border rounded-xl cursor-crosshair" style="height: 200px;"></canvas>
+            <div class="flex items-center justify-between mt-4">
+              <button onclick="clearSignature()" class="px-4 py-2 text-sm rounded-lg text-gray-400 border border-cs-border hover:bg-cs-dark transition-all flex items-center gap-2">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                Löschen
+              </button>
+              <button onclick="saveSignature()" class="px-6 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-cs-gold to-yellow-600 text-black hover:shadow-lg hover:shadow-cs-gold/30 transition-all flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                Unterschrift einreichen
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SETTINGS PAGE ===== -->
+        <div id="page-settings" class="page-content space-y-6">
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Kontoeinstellungen</h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Vollständiger Name</label>
+                <input id="settingsNameInput" type="text" class="cs-input" value="John Doe" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">E-Mail</label>
+                <input id="settingsEmailInput" type="email" class="cs-input" value="john.doe@email.com" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Telefon</label>
+                <input type="tel" class="cs-input" value="+49 30 1234 5678" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 uppercase tracking-wider mb-2">Land</label>
+                <select class="cs-input">
+                  <option>Deutschland</option>
+                  <option>Österreich</option>
+                  <option>Schweiz</option>
+                  <option>Luxemburg</option>
+                </select>
+              </div>
+            </div>
+            <button class="mt-5 px-6 py-2.5 text-sm font-semibold rounded-lg bg-cs-blue/10 text-cs-blue border border-cs-blue/30 hover:bg-cs-blue/20 transition-all">Änderungen speichern</button>
+          </div>
+
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6">
+            <h3 class="font-semibold text-lg mb-5">Sicherheit</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border">
+                <div>
+                  <div class="text-sm font-semibold">Passwort ändern</div>
+                  <div class="text-xs text-gray-500">Zuletzt vor 30 Tagen geändert</div>
+                </div>
+                <button class="px-4 py-2 text-xs rounded-lg text-cs-blue border border-cs-blue/30 hover:bg-cs-blue/10 transition-all">Ändern</button>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border">
+                <div>
+                  <div class="text-sm font-semibold">Zwei-Faktor-Authentifizierung</div>
+                  <div class="text-xs text-gray-500">Per SMS aktiviert</div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full status-active text-xs font-medium">Aktiviert</span>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-cs-dark rounded-xl border border-cs-border">
+                <div>
+                  <div class="text-sm font-semibold">Anmeldesitzungen</div>
+                  <div class="text-xs text-gray-500">2 aktive Sitzungen</div>
+                </div>
+                <button class="px-4 py-2 text-xs rounded-lg text-red-400 border border-red-400/30 hover:bg-red-500/10 transition-all">Alle abmelden</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-cs-card border border-cs-border rounded-2xl p-6 border-red-500/20">
+            <h3 class="font-semibold text-lg mb-5 text-red-400">Gefahrenzone</h3>
+            <div class="flex items-center justify-between p-4 bg-red-500/5 rounded-xl border border-red-500/20">
+              <div>
+                <div class="text-sm font-semibold">Konto löschen</div>
+                <div class="text-xs text-gray-500">Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden</div>
+              </div>
+              <button class="px-4 py-2 text-xs rounded-lg text-red-400 border border-red-400/30 hover:bg-red-500/10 transition-all">Löschen</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="member.js"></script>
+</body>
+</html>
