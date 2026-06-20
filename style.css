@@ -256,7 +256,7 @@ body {
 
 /* Responsive sidebar */
 @media (max-width: 1023px) {
-  .sidebar {
+  #sidebar {
     position: fixed;
     left: -100%;
     top: 0;
@@ -264,7 +264,7 @@ body {
     z-index: 100;
     transition: left 0.3s ease;
   }
-  .sidebar.open {
+  #sidebar.open {
     left: 0;
   }
   .sidebar-overlay {
