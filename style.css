@@ -1,0 +1,393 @@
+/* ================================
+   CryptoSphere — Shared Styles
+   ================================ */
+
+/* Base */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #0B0F1A;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0F1A;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E2740;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2A3656;
+}
+
+/* Selection */
+::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: #fff;
+}
+
+/* ================================
+   Inputs
+   ================================ */
+.cs-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(15, 20, 36, 0.6);
+  border: 1px solid #1E2740;
+  border-radius: 0.75rem;
+  color: #fff;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+.cs-input::placeholder {
+  color: #4B5568;
+}
+.cs-input:focus {
+  border-color: #00AEEF;
+  box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
+}
+
+/* ================================
+   Glow Effects
+   ================================ */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), 0 0 40px rgba(212, 175, 55, 0.3);
+}
+.glow-blue {
+  box-shadow: 0 0 20px rgba(0, 174, 239, 0.6), 0 0 40px rgba(0, 174, 239, 0.3);
+}
+
+.bg-radial-glow {
+  background: radial-gradient(ellipse at center, rgba(0, 174, 239, 0.08) 0%, transparent 60%);
+}
+
+/* ================================
+   Card Glow
+   ================================ */
+.card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(0, 174, 239, 0.15), transparent);
+  filter: blur(20px);
+}
+.step-card:hover .card-glow,
+.feature-card:hover .card-glow {
+  opacity: 1;
+}
+
+/* ================================
+   Animations
+   ================================ */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 174, 239, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(0, 174, 239, 0.6);
+  }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* ================================
+   Scroll Reveal
+   ================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================
+   FAQ Accordion
+   ================================ */
+.faq-item.active {
+  border-color: rgba(0, 174, 239, 0.5);
+}
+.faq-item.active .faq-icon {
+  transform: rotate(180deg);
+  color: #00AEEF;
+}
+.faq-content {
+  transition: max-height 0.4s ease;
+}
+.faq-item.active .faq-content {
+  max-height: 300px;
+}
+
+/* ================================
+   Navbar scrolled state
+   ================================ */
+#navbar.scrolled {
+  background: rgba(11, 15, 26, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid #1E2740;
+}
+
+/* ================================
+   Member Dashboard / Admin shared
+   ================================ */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  color: #9CA3AF;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+.sidebar-link:hover {
+  background: rgba(0, 174, 239, 0.08);
+  color: #fff;
+}
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(0, 174, 239, 0.08));
+  color: #D4AF37;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+.sidebar-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: #D4AF37;
+  border-radius: 2px;
+}
+
+/* Dashboard page transition */
+.page-content {
+  display: none;
+}
+.page-content.active {
+  display: block;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+/* Network node styling */
+.network-node {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Responsive sidebar */
+@media (max-width: 1023px) {
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    z-index: 100;
+    transition: left 0.3s ease;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Grid background pattern */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(30, 39, 64, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 39, 64, 0.4) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Gradient text */
+.gradient-text-gold {
+  background: linear-gradient(135deg, #D4AF37, #F0D060, #D4AF37);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-blue {
+  background: linear-gradient(135deg, #00AEEF, #50D4FF, #00AEEF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Notification dot */
+.notification-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #0B0F1A;
+}
+
+/* Status badges */
+.status-active {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+.status-pending {
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #eab308;
+}
+.status-inactive {
+  background: rgba(107, 114, 128, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  color: #6b7280;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(17, 23, 43, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 39, 64, 0.8);
+}
+
+/* Table styling */
+.cs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.cs-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  border-bottom: 1px solid #1E2740;
+}
+.cs-table td {
+  padding: 1rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(30, 39, 64, 0.5);
+}
+.cs-table tbody tr {
+  transition: background 0.2s ease;
+}
+.cs-table tbody tr:hover {
+  background: rgba(0, 174, 239, 0.04);
+}
+
+/* ================================
+   Subscribe Modal
+   ================================ */
+#subscribeModal.active {
+  animation: modalFadeIn 0.3s ease forwards;
+}
+#subscribeModal.active .subscribe-modal-content {
+  animation: modalSlideUp 0.4s ease forwards;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
